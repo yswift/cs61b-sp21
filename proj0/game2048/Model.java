@@ -5,7 +5,7 @@ import java.util.Observable;
 
 
 /** The state of a game of 2048.
- *  @author TODO: YOUR NAME HERE
+ *  @author yswift
  */
 public class Model extends Observable {
     /** Current contents of the board. */
@@ -113,12 +113,69 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        board.setViewingPerspective(side);
+        for (int col = 0; col < board.size(); col++) {
+            changed = tileCol(col) || changed;
+        }
 
         checkGameOver();
         if (changed) {
             setChanged();
         }
+        board.setViewingPerspective(Side.NORTH);
         return changed;
+    }
+
+    /**
+     * 处理一列的数据，返回是否有变化
+     * 从上到下处理：
+     * 如果当前位置为空，向下找第一个 tile，如果找到，移动到当前位置；
+     * 如果当前位置有 tile，向下找第一个值相同 tile，如果找到，合并到当前位置，分数加上合并后的值
+     * @param col 列号
+     * @return 是否有变化
+     */
+    private boolean tileCol(int col) {
+        boolean changed = false;
+        for (int row = board.size() - 1; row > 0; row--) {
+            Tile t = board.tile(col, row);
+            if (t == null) {
+                Tile t1 = findNoNullTile(col, row);
+                if (t1 != null) {
+                    board.move(col, row, t1);
+                    changed = true;
+                    row++; // 重新检查当前位置，因为当前位置已经变了
+                }
+            } else {
+                Tile t1 = findTileByValue(col, row, t.value());
+                if (t1 != null) {
+                    board.move(col, row, t1);
+                    score += t1.value() * 2;
+                    changed = true;
+                }
+            }
+        }
+        return changed;
+    }
+
+    // 向下找向下找第一个非空的 tile，如果找到，返回，没找到，返回null；
+    private Tile findNoNullTile(int col, int row) {
+        for (int i = row - 1; i >= 0; i--) {
+            Tile t = board.tile(col, i);
+            if (t != null) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    // 向下找向下找第一个值为 value 的 tile，如果找到，返回，没找到，返回null；
+    private Tile findTileByValue(int col, int row, int value) {
+        Tile t = findNoNullTile(col, row);
+        if (t == null || t.value() != value) {
+            return null;
+        } else {
+            return t;
+        }
     }
 
     /** Checks if the game is over and sets the gameOver variable
@@ -137,7 +194,14 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
+        int size = b.size();
+        for (int col = 0; col < size; col++) {
+            for (int row = 0; row < size; row++) {
+                if (b.tile(col, row) == null) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -147,7 +211,15 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        int size = b.size();
+        for (int col = 0; col < size; col++) {
+            for (int row = 0; row < size; row++) {
+                Tile t = b.tile(col, row);
+                if (t != null && t.value() == MAX_PIECE) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -158,7 +230,23 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        if (emptySpaceExists(b)) {
+            return true;
+        }
+        int size = b.size();
+        for (int col = 0; col < size; col++) {
+            for (int row = 0; row < size; row++) {
+                Tile t = b.tile(col, row);
+                if (t != null) {
+                    if (col > 0 && t.value() == b.tile(col - 1, row).value()) {
+                        return true;
+                    }
+                    if (row > 0 && t.value() == b.tile(col, row - 1).value()) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 

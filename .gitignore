@@ -12,7 +12,7 @@
 *.log
 *.ctxt
 .mtj.tmp/
-*.jar
+# *.jar
 *.war
 *.ear
 *.zip
@@ -68,7 +68,7 @@ spec/
 .mtj.tmp/
 
 # Package Files #
-*.jar
+# *.jar
 *.war
 *.ear
 

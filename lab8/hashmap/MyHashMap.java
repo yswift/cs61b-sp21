@@ -119,7 +119,6 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return table;
     }
 
-    // TODO: Implement the methods of the Map61B Interface below
     // Your code won't compile until you do so!
     private int getIndex(K key) {
         int h;
@@ -248,7 +247,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         Iterator<Node> bucketIter;
         int currentBucket;
 
-        public KeyIterator() {
+        private KeyIterator() {
             currentBucket = 0;
             bucketIter = buckets[currentBucket].iterator();
         }

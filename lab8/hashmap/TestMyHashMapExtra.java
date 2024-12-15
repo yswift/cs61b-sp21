@@ -39,10 +39,13 @@ public class TestMyHashMapExtra {
         assertTrue(q.containsKey("b"));
         assertTrue(q.containsKey("c"));
         assertTrue(q.containsKey("d"));
+        assertNull(q.get("e"));
+        assertEquals(4, q.size());
         assertTrue(null != q.remove("c"));      // a b d
         assertTrue(q.containsKey("a"));
         assertTrue(q.containsKey("b"));
         assertTrue(q.containsKey("d"));
+        assertEquals(3, q.size());
         q.put("f", "a");                         // a b d f
         assertTrue(null != q.remove("d"));      // a b f
         assertTrue(q.containsKey("a"));

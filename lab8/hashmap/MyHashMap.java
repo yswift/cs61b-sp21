@@ -1,14 +1,14 @@
 package hashmap;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
- *  A hash table-backed Map implementation. Provides amortized constant time
- *  access to elements via get(), remove(), and put() in the best case.
+ * A hash table-backed Map implementation. Provides amortized constant time
+ * access to elements via get(), remove(), and put() in the best case.
+ * <p>
+ * Assumes null keys will never be inserted, and does not resize down upon remove().
  *
- *  Assumes null keys will never be inserted, and does not resize down upon remove().
- *  @author yswift
+ * @author yswift
  */
 public class MyHashMap<K, V> implements Map61B<K, V> {
 
@@ -46,10 +46,12 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     // You should probably define some more!
     private Set<K> keySet;
     private int capacity;
-    private double loadFactor;
+    private final double loadFactor;
     private int size;
 
-    /** Constructors */
+    /**
+     * Constructors
+     */
     public MyHashMap() {
         this(16, 0.75);
     }
@@ -63,7 +65,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * The load factor (# items / # buckets) should always be <= loadFactor
      *
      * @param initialSize initial size of backing array
-     * @param maxLoad maximum load factor
+     * @param maxLoad     maximum load factor
      */
     public MyHashMap(int initialSize, double maxLoad) {
         capacity = initialSize;
@@ -80,19 +82,19 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     /**
      * Returns a data structure to be a hash table bucket
-     *
+     * <p>
      * The only requirements of a hash table bucket are that we can:
-     *  1. Insert items (`add` method)
-     *  2. Remove items (`remove` method)
-     *  3. Iterate through items (`iterator` method)
-     *
+     * 1. Insert items (`add` method)
+     * 2. Remove items (`remove` method)
+     * 3. Iterate through items (`iterator` method)
+     * <p>
      * Each of these methods is supported by java.util.Collection,
      * Most data structures in Java inherit from Collection, so we
      * can use almost any data structure as our buckets.
-     *
+     * <p>
      * Override this method to use different data structures as
      * the underlying bucket type
-     *
+     * <p>
      * BE SURE TO CALL THIS FACTORY METHOD INSTEAD OF CREATING YOUR
      * OWN BUCKET DATA STRUCTURES WITH THE NEW OPERATOR!
      */
@@ -103,7 +105,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     /**
      * Returns a table to back our hash table. As per the comment
      * above, this table can be an array of Collection objects
-     *
+     * <p>
      * BE SURE TO CALL THIS FACTORY METHOD WHEN CREATING A TABLE SO
      * THAT ALL BUCKET TYPES ARE OF JAVA.UTIL.COLLECTION
      *
@@ -122,7 +124,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     private int getIndex(K key) {
         int h;
         int hash = (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-        return (capacity-1) & hash;
+        return (capacity - 1) & hash;
     }
 
     @Override
@@ -229,11 +231,17 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     }
 
     private class KeySet extends AbstractSet<K> {
-        public int size() { return size; }
+        public int size() {
+            return size;
+        }
 
-        public void clear() { MyHashMap.this.clear(); }
+        public void clear() {
+            MyHashMap.this.clear();
+        }
 
-        public Iterator<K> iterator() { return new KeyIterator(); }
+        public Iterator<K> iterator() {
+            return new KeyIterator();
+        }
     }
 
     private class KeyIterator implements Iterator<K> {
@@ -250,7 +258,8 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
             if (bucketIter.hasNext()) {
                 return true;
             }
-            for (currentBucket++; currentBucket < buckets.length && buckets[currentBucket].isEmpty(); ) {
+            currentBucket++;
+            while (currentBucket < buckets.length && buckets[currentBucket].isEmpty()) {
                 currentBucket++;
             }
             if (currentBucket < buckets.length) {

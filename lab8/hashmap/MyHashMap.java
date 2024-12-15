@@ -25,20 +25,20 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
             value = v;
         }
 
-        public final int hashCode() {
-            return Objects.hashCode(key);
-        }
-
-        public final boolean equals(Object o) {
-            if (o == this)
-                return true;
-            if (o == null)
-                return false;
-            if (o.getClass() != this.getClass())
-                return false;
-            Node n = (Node) o;
-            return Objects.equals(key, n.key);
-        }
+//        public final int hashCode() {
+//            return Objects.hashCode(key);
+//        }
+//
+//        public final boolean equals(Object o) {
+//            if (o == this)
+//                return true;
+//            if (o == null)
+//                return false;
+//            if (o.getClass() != this.getClass())
+//                return false;
+//            Node n = (Node) o;
+//            return Objects.equals(key, n.key);
+//        }
     }
 
     /* Instance Variables */
@@ -119,7 +119,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     // TODO: Implement the methods of the Map61B Interface below
     // Your code won't compile until you do so!
-    int getIndex(K key) {
+    private int getIndex(K key) {
         int h;
         int hash = (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
         return (capacity-1) & hash;
@@ -138,9 +138,11 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public boolean containsKey(K key) {
-        int idx = getIndex(key);
-        Node n = createNode(key, null);
-        return buckets[idx].contains(n);
+        Node n = getNode(key);
+        return n != null;
+//        int idx = getIndex(key);
+//        Node n = createNode(key, null);
+//        return buckets[idx].contains(n);
     }
 
     @Override
@@ -202,7 +204,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return new KeyIterator();
     }
 
-    protected final Node getNode(K key) {
+    private Node getNode(K key) {
         int idx = getIndex(key);
         for (Node n : buckets[idx]) {
             if (n.key.equals(key)) {
@@ -226,7 +228,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         }
     }
 
-    final class KeySet extends AbstractSet<K> {
+    private class KeySet extends AbstractSet<K> {
         public int size() { return size; }
 
         public void clear() { MyHashMap.this.clear(); }

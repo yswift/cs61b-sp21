@@ -25,7 +25,7 @@ public class TimeAList {
         AList<Integer> Ns = new AList<>();
         AList<Double> times = new AList<>();
         AList<Integer> opCounts = new AList<>();
-        for (int N = 1000; N <= 20_000_000; N *= 2) {
+        for (int N = 1000; N <= 128000; N *= 2) {
             timeAListConstruction(N, Ns, times, opCounts);
         }
         printTimingTable(Ns, times, opCounts);

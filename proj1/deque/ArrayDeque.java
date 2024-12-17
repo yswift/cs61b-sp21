@@ -49,7 +49,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     @Override
     public void printDeque() {
         for (int i = 0; i < size; i++) {
-            System.out.print(items[(font + 1 + i) % items.length] + " ");
+            System.out.print(get(i) + " ");
         }
         System.out.println();
     }
@@ -96,10 +96,37 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         return new ArrayDequeIterator();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof Deque)) {
+            return false;
+        }
+        Deque<T> other = (Deque<T>) o;
+        if (size != other.size()) {
+            return false;
+        }
+        Iterator<T> it = iterator();
+        Iterator<T> otherIt = null;
+        if (o instanceof ArrayDeque) {
+            otherIt = ((ArrayDeque<T>) o).iterator();
+        } else if (o instanceof LinkedListDeque) {
+            otherIt = ((LinkedListDeque<T>) o).iterator();
+        }
+        if (otherIt == null) {
+            return false;
+        }
+        while (it.hasNext()) {
+            if (!it.next().equals(otherIt.next())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private class ArrayDequeIterator implements Iterator<T> {
         private int index;
 
-        public ArrayDequeIterator() {
+        private ArrayDequeIterator() {
             index = 0;
         }
 
@@ -110,7 +137,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
         @Override
         public T next() {
-            T item = items[(font + index) % items.length];
+            T item = get(index);
             index++;
             return item;
         }

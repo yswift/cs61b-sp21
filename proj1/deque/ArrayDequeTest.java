@@ -120,7 +120,11 @@ public class ArrayDequeTest {
         }
         adeq.addLast(8);
         assertEquals(9, adeq.size());
+        assertEquals(0, adeq.get(0).intValue());
+        assertEquals(1, adeq.get(1).intValue());
+        assertEquals(5, adeq.get(5).intValue());
         assertEquals(0, adeq.removeFirst().intValue());
+        assertEquals(1, adeq.get(0).intValue());
         assertEquals(8, adeq.size());
         assertEquals(8, adeq.removeLast().intValue());
     }

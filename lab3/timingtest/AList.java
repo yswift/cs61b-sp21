@@ -15,6 +15,7 @@ package timingtest;
 */
 
 public class AList<Item> {
+    private static final float ResizingFactor = 1.5F;
     private Item[] items;
     private int size;
 
@@ -34,7 +35,7 @@ public class AList<Item> {
     /** Inserts X into the back of the list. */
     public void addLast(Item x) {
         if (size == items.length) {
-            resize(size + 1);
+            resize(Math.round(size * ResizingFactor));
         }
 
         items[size] = x;

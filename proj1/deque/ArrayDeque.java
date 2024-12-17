@@ -105,18 +105,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (size != other.size()) {
             return false;
         }
-        Iterator<T> it = iterator();
-        Iterator<T> otherIt = null;
-        if (o instanceof ArrayDeque) {
-            otherIt = ((ArrayDeque<T>) o).iterator();
-        } else if (o instanceof LinkedListDeque) {
-            otherIt = ((LinkedListDeque<T>) o).iterator();
-        }
-        if (otherIt == null) {
-            return false;
-        }
-        while (it.hasNext()) {
-            if (!it.next().equals(otherIt.next())) {
+        for (int i = 0; i < size; i++) {
+            if (!get(i).equals(other.get(i))) {
                 return false;
             }
         }

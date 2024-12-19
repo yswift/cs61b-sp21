@@ -437,7 +437,8 @@ if __name__ == "__main__":
             environ['CLASSPATH'] = "{}:{}".format(prog_dir, environ['CLASSPATH'])
         else:
             environ['CLASSPATH'] = "{}".format(prog_dir)
-        JAVA_COMMAND = 'exec ' + JAVA_COMMAND
+        # 在 windows 下，使用 exec 会失败，所以在 windows 下不使用 exec
+        # JAVA_COMMAND = 'exec ' + JAVA_COMMAND
 
     num_tests = len(files)
     errs = 0

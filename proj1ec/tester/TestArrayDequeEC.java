@@ -25,6 +25,7 @@ public class TestArrayDequeEC {
             ads.addLast(i);
         },
         () -> {
+            Assert.assertEquals("isEmpty", ads.isEmpty(), sad.isEmpty());
             if (sad.isEmpty() || ads.isEmpty()) {
                 return;
             }
@@ -32,12 +33,14 @@ public class TestArrayDequeEC {
             Assert.assertEquals("get", ads.get(i), sad.get(i));
         },
         () -> {
+            Assert.assertEquals("isEmpty", ads.isEmpty(), sad.isEmpty());
             if (sad.isEmpty() || ads.isEmpty()) {
                 return;
             }
             Assert.assertEquals("removeFirst", ads.removeFirst(), sad.removeFirst());
         },
         () -> {
+            Assert.assertEquals("isEmpty", ads.isEmpty(), sad.isEmpty());
             if (sad.isEmpty() || ads.isEmpty()) {
                 return;
             }
@@ -57,7 +60,7 @@ public class TestArrayDequeEC {
         Assert.assertEquals( "size()", ads.size(), sad.size() );
     }
 
-    public static void main(String[] args) {
-        jh61b.junit.TestRunner.runTests(TestArrayDequeEC.class);
-    }
+//    public static void main(String[] args) {
+//        jh61b.junit.TestRunner.runTests(TestArrayDequeEC.class);
+//    }
 }

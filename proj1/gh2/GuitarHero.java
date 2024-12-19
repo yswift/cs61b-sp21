@@ -8,7 +8,7 @@ public class GuitarHero {
     private static final GuitarString[] strings = new GuitarString[keyboard.length()];
     static {
         for (int i = 0; i < keyboard.length(); i++) {
-            strings[i] = new GuitarString(440 * Math.pow(2, (i - 24) / 12.0));
+            strings[i] = new GuitarString(440.0 * Math.pow(2, (i - 24) / 12.0));
         }
     }
 

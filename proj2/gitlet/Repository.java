@@ -84,9 +84,7 @@ public class Repository {
             return;
         }
 
-        Commit currentCommit = Commit.load(currentCommitId);
-        Commit mergedCommit = Commit.load(mergedCommitId);
-        Commit commit = new Commit(message, currentCommit.getHash(), mergedCommit.getHash());
+        Commit commit = new Commit(message, currentCommitId, mergedCommitId);
         for (Map.Entry<String, String> entry : staging.getAddition().entrySet()) {
             commit.addBlob(entry.getKey(), entry.getValue());
         }

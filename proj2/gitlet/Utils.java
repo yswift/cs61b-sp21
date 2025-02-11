@@ -223,6 +223,21 @@ class Utils {
 
 
     /* MESSAGES AND ERROR REPORTING */
+    /**
+     * Prints out MESSAGE and exits with error code -1.
+     * Note:
+     * The functionality for erroring/exit codes is different within Gitlet
+     * so DO NOT use this as a reference.
+     * Refer to the spec for more information.
+     *
+     * @param message message to print
+     */
+    public static void exitWithError(String message) {
+        if (message != null && !message.equals("")) {
+            System.out.println(message);
+        }
+        System.exit(0);
+    }
 
     /** Return a GitletException whose message is composed from MSG and ARGS as
      *  for the String.format method. */

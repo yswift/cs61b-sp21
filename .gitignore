@@ -53,6 +53,8 @@ $RECYCLE.BIN/
 *.msp
 *.lnk
 
+#project 2
+.gitlet/
 
 *.pyc
 .DS_Store

@@ -90,6 +90,9 @@ public class Commit implements Dumpable {
             }
         }
         File commitFile = Utils.join(COMMIT_DIR, hash);
+        if (!commitFile.exists()) {
+            return null;
+        }
         return Utils.readObject(commitFile, Commit.class);
     }
 

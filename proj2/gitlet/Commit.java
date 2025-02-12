@@ -139,7 +139,7 @@ public class Commit implements Dumpable {
             sb.append(parentId.substring(0, 7)).append(" ");
             sb.append(mergeParentId.substring(0, 7)).append('\n');
         }
-        sb.append("Date: S").append(simpleDateFormat.format(timestamp)).append('\n');
+        sb.append("Date: ").append(simpleDateFormat.format(timestamp)).append('\n');
         sb.append(message).append('\n');
         return sb.toString();
     }

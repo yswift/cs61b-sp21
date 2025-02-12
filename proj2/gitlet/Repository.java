@@ -4,9 +4,6 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import gitlet.Utils;
-
-
 /** Represents a gitlet repository.
  *  does at a high level.
  *
@@ -28,7 +25,8 @@ public class Repository {
     // init command
     public static void init() {
         if (GITLET_DIR.exists()) {
-            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            System.out.println("A Gitlet version-control system already exists in " +
+                    "the current directory.");
             return;
         }
         GITLET_DIR.mkdir();
@@ -56,7 +54,8 @@ public class Repository {
         }
         Blob blob = new Blob(filename, Utils.readContentsAsString(file));
 
-        // If the current working version of the file is identical to the version in the current commit, do not stage it to be added
+        // If the current working version of the file is identical to the version
+        // in the current commit, do not stage it to be added
         Commit headCommit = Commit.load(Branch.getCommitId(Head.getBranch()));
         if (headCommit != null && headCommit.getBlobs().containsKey(filename)) {
             Blob headBlob = Blob.load(headCommit.getBlobs().get(filename));
@@ -77,7 +76,7 @@ public class Repository {
         commit(message, currentCommitId, null);
     }
 
-    private static void commit(String message , String currentCommitId, String mergedCommitId) {
+    private static void commit(String message ,String currentCommitId, String mergedCommitId) {
         Staging staging = Staging.load();
         if (staging.getAddition().isEmpty() && staging.getRemoval().isEmpty()) {
             Utils.exitWithError("No changes added to the commit.");
@@ -102,7 +101,8 @@ public class Repository {
     public static void rm(String filename) {
         Commit headCommit = Commit.load(Branch.getCommitId(Head.getBranch()));
         Staging staging = Staging.load();
-        if (!staging.getAddition().containsKey(filename) && !headCommit.getBlobs().containsKey(filename)) {
+        if (!staging.getAddition().containsKey(filename)
+                && !headCommit.getBlobs().containsKey(filename)) {
             Utils.exitWithError("No reason to remove the file.");
             return;
         }
@@ -174,31 +174,27 @@ public class Repository {
 
         System.out.println("=== Staged Files ===");
         Staging staging = Staging.load();
-        for (String filename : staging.getAddition().keySet()) {
-            System.out.println(filename);
-        }
-        System.out.println();
+        printCollectionString(staging.getAddition().keySet());
 
         System.out.println("=== Removed Files ===");
-        for (String filename : staging.getRemoval()) {
-            System.out.println(filename);
-        }
-        System.out.println();
+        printCollectionString(staging.getRemoval());
 
         Commit currentCommit = Commit.load(Branch.getCommitId(Head.getBranch()));
         List<String> cwdFileNames = Utils.plainFilenamesIn(CWD);
 
         System.out.println("=== Modifications Not Staged For Commit ===");
-        List<String> modificationsNotStagedForCommit = getModificationsNotStagedForCommit(staging, currentCommit, cwdFileNames);
-        for (String filename : modificationsNotStagedForCommit) {
-            System.out.println(filename);
-        }
-        System.out.println();
+        List<String> modificationsNotStagedForCommit = getModificationsNotStagedForCommit(
+                staging, currentCommit, cwdFileNames);
+        printCollectionString(modificationsNotStagedForCommit);
 
         System.out.println("=== Untracked Files ===");
         List<String> untrackedFiles = getUntrackedFiles(staging, currentCommit, cwdFileNames);
-        for (String filename : untrackedFiles) {
-            System.out.println(filename);
+        printCollectionString(untrackedFiles);
+    }
+
+    private static void printCollectionString(Collection<String> collection) {
+        for (String item : collection) {
+            System.out.println(item);
         }
         System.out.println();
     }
@@ -206,29 +202,52 @@ public class Repository {
     // === Modifications Not Staged For Commit ===
     // junk.txt (deleted)
     // wug3.txt (modified)
-    private static List<String> getModificationsNotStagedForCommit(Staging staging, Commit currentCommit, List<String> cwdFileNames) {
+    private static List<String> getModificationsNotStagedForCommit(Staging staging,
+                                                                   Commit currentCommit,
+                                                                   List<String> cwdFileNames) {
         List<String> result = new ArrayList<>();
-        for (String filename : cwdFileNames) {
-            boolean tracked = currentCommit.getBlobs().containsKey(filename);
-            boolean staged = staging.getAddition().containsKey(filename);
-            boolean modified = false;
-            if (tracked) {
-                Blob headBlob = Blob.load(currentCommit.getBlobs().get(filename));
-                File file = Utils.join(CWD, filename);
-                Blob blob = new Blob(filename, Utils.readContentsAsString(file));
-                modified = !headBlob.getHash().equals(blob.getHash());
+        for (String fileName : cwdFileNames) {
+            File file = Utils.join(CWD, fileName);
+            Blob blob = new Blob(fileName, Utils.readContents(file));
+            // case1: Tracked in the current commit, changed in the working directory, but not
+            // staged; or
+            boolean tracked = currentCommit.getBlobs().containsKey(fileName);
+            boolean changed = !blob.getHash().equals(currentCommit.getBlobs().get(fileName));
+            boolean staged = staging.getAddition().containsKey(fileName);
+            if (tracked && changed && !staged) {
+                result.add(fileName + " (modified)");
+                continue;
             }
-            // modifications not staged for commit
-            if ((staged || modified) && !staging.getRemoval().contains(filename)) {
-                result.add(filename);
+            // case2: Staged for addition, but with different contents than in the working
+            // directory; or
+            changed = !blob.getHash().equals(staging.getAddition().get(fileName));
+            if (staged && changed) {
+                result.add(fileName + " (modified)");
             }
         }
+        // case3: Staged for addition, but deleted in the working directory; or
+        for (String fileName : staging.getAddition().keySet()) {
+            if (!cwdFileNames.contains(fileName)) {
+                result.add(fileName + " (deleted)");
+            }
+        }
+        // case4: Not staged for removal, but tracked in the current commit and deleted from the
+        // working directory.
+        for (String fileName : currentCommit.getBlobs().keySet()) {
+            boolean stagedForRemoval = staging.getRemoval().contains(fileName);
+            boolean cwdContains = cwdFileNames.contains(fileName);
+            if (!stagedForRemoval && !cwdContains) {
+                result.add(fileName + " (deleted)");
+            }
+        }
+        Collections.sort(result);
         return result;
     }
 
     // === Untracked Files ===
     // random.stuff
-    private static List<String> getUntrackedFiles(Staging staging, Commit currentCommit, List<String> cwdFileNames) {
+    private static List<String> getUntrackedFiles(Staging staging, Commit currentCommit,
+                                                  List<String> cwdFileNames) {
         List<String> result = new ArrayList<>();
         for (String fileName : cwdFileNames) {
             boolean tracked = currentCommit.getBlobs().containsKey(fileName);
@@ -276,7 +295,8 @@ public class Repository {
         Set<String> fileNames = branchCommit.getBlobs().keySet();
         for (String untrackedFileName : untrackedFiles) {
             if (fileNames.contains(untrackedFileName)) {
-                Utils.exitWithError("There is an untracked file in the way; delete it or add it first.");
+                Utils.exitWithError("There is an untracked file in the way; " +
+                        "delete it or add it first.");
             }
         }
         stagingArea.clear();
@@ -370,7 +390,8 @@ public class Repository {
         List<String> untrackedFiles = getUntrackedFiles(staging, currentCommit, cwdFileNames);
         for (String untrackedFileName : untrackedFiles) {
             if (givenCommit.getBlobs().containsKey(untrackedFileName)) {
-                Utils.exitWithError("There is an untracked file in the way; delete it or add it first.");
+                Utils.exitWithError("There is an untracked file in the way; " +
+                        "delete it or add it first.");
             }
         }
         boolean conflict = processMerge(staging, splitPoint, currentCommit, givenCommit);

@@ -25,8 +25,8 @@ public class Repository {
     // init command
     public static void init() {
         if (GITLET_DIR.exists()) {
-            System.out.println("A Gitlet version-control system already exists in " +
-                    "the current directory.");
+            System.out.println("A Gitlet version-control system already exists in "
+                    + "the current directory.");
             return;
         }
         GITLET_DIR.mkdir();
@@ -54,18 +54,20 @@ public class Repository {
         }
         Blob blob = new Blob(filename, Utils.readContentsAsString(file));
 
+        Staging staging = Staging.load();
         // If the current working version of the file is identical to the version
         // in the current commit, do not stage it to be added
         Commit headCommit = Commit.load(Branch.getCommitId(Head.getBranch()));
         if (headCommit != null && headCommit.getBlobs().containsKey(filename)) {
             Blob headBlob = Blob.load(headCommit.getBlobs().get(filename));
             if (headBlob != null && headBlob.getHash().equals(blob.getHash())) {
+                staging.getRemoval().remove(filename);
+                staging.save();
                 return;
             }
         }
 
         blob.save();
-        Staging staging = Staging.load();
         staging.add(filename, blob.getHash());
         staging.save();
     }
@@ -76,7 +78,7 @@ public class Repository {
         commit(message, currentCommitId, null);
     }
 
-    private static void commit(String message ,String currentCommitId, String mergedCommitId) {
+    private static void commit(String message, String currentCommitId, String mergedCommitId) {
         if (message.isEmpty()) {
             Utils.exitWithError("Please enter a commit message.");
             return;
@@ -305,8 +307,8 @@ public class Repository {
         Set<String> fileNames = branchCommit.getBlobs().keySet();
         for (String untrackedFileName : untrackedFiles) {
             if (fileNames.contains(untrackedFileName)) {
-                Utils.exitWithError("There is an untracked file in the way; " +
-                        "delete it or add it first.");
+                Utils.exitWithError("There is an untracked file in the way; "
+                        + "delete it or add it first.");
             }
         }
         stagingArea.clear();
@@ -400,8 +402,8 @@ public class Repository {
         List<String> untrackedFiles = getUntrackedFiles(staging, currentCommit, cwdFileNames);
         for (String untrackedFileName : untrackedFiles) {
             if (givenCommit.getBlobs().containsKey(untrackedFileName)) {
-                Utils.exitWithError("There is an untracked file in the way; " +
-                        "delete it or add it first.");
+                Utils.exitWithError("There is an untracked file in the way; "
+                        + "delete it or add it first.");
             }
         }
         boolean conflict = processMerge(staging, splitPoint, currentCommit, givenCommit);

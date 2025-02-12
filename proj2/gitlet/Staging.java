@@ -16,11 +16,6 @@ public class Staging implements Dumpable {
         addition.put(filename, blobId);
     }
 
-    public void remove(String filename) {
-        addition.remove(filename);
-        removal.add(filename);
-    }
-
     public HashMap<String, String> getAddition() {
         return addition;
     }

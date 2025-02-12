@@ -99,17 +99,22 @@ public class Repository {
 
     // rm command
     public static void rm(String filename) {
-        Commit headCommit = Commit.load(Branch.getCommitId(Head.getBranch()));
         Staging staging = Staging.load();
-        if (!staging.getAddition().containsKey(filename)
-                && !headCommit.getBlobs().containsKey(filename)) {
-            Utils.exitWithError("No reason to remove the file.");
+        if (staging.getAddition().containsKey(filename)) {
+            staging.getAddition().remove(filename);
+            staging.save();
             return;
         }
-        File file = Utils.join(CWD, filename);
-        file.delete();
-        staging.remove(filename);
-        staging.save();
+
+        Commit currentCommit = Commit.load(Branch.getCommitId(Head.getBranch()));
+        if (currentCommit.getBlobs().containsKey(filename)) {
+            staging.getRemoval().add(filename);
+            Utils.join(CWD, filename).delete();
+            staging.save();
+            return;
+        }
+
+        Utils.exitWithError("No reason to remove the file.");
     }
 
     // log command
@@ -257,6 +262,7 @@ public class Repository {
                 result.add(fileName);
             }
         }
+        Collections.sort(result);
         return result;
     }
 

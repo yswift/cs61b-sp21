@@ -403,7 +403,7 @@ public class Repository {
         for (String untrackedFileName : untrackedFiles) {
             if (givenCommit.getBlobs().containsKey(untrackedFileName)) {
                 Utils.exitWithError("There is an untracked file in the way; "
-                        + "delete it or add it first.");
+                        + "delete it, or add and commit it first.");
             }
         }
         boolean conflict = processMerge(staging, splitPoint, currentCommit, givenCommit);

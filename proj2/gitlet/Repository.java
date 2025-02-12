@@ -77,6 +77,10 @@ public class Repository {
     }
 
     private static void commit(String message ,String currentCommitId, String mergedCommitId) {
+        if (message.isEmpty()) {
+            Utils.exitWithError("Please enter a commit message.");
+            return;
+        }
         Staging staging = Staging.load();
         if (staging.getAddition().isEmpty() && staging.getRemoval().isEmpty()) {
             Utils.exitWithError("No changes added to the commit.");

@@ -63,6 +63,10 @@ public class Commit implements Dumpable {
         return parentId;
     }
 
+    public String getMergeParentId() {
+        return mergeParentId;
+    }
+
     public String getHash() {
         return hash;
     }

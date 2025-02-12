@@ -418,17 +418,32 @@ public class Repository {
 
     private static Commit findSplitPoint(Commit currentCommit, Commit givenCommit) {
         Set<String> currentAncestors = new HashSet<>();
-        for (String commitId = currentCommit.getHash(); commitId != null;) {
+        Queue<String> bfsQueue = new ArrayDeque<>();
+        bfsQueue.add(currentCommit.getHash());
+        while (!bfsQueue.isEmpty()) {
+            String commitId = bfsQueue.remove();
+            Commit commit = Commit.load(commitId);
             currentAncestors.add(commitId);
-            Commit commit = Commit.load(commitId);
-            commitId = commit.getParentId();
-        }
-        for (String commitId = givenCommit.getHash(); commitId != null;) {
-            if (currentAncestors.contains(commitId)) {
-                return Commit.load(commitId);
+            if (commit.getParentId() != null) {
+                bfsQueue.add(commit.getParentId());
             }
+            if (commit.getMergeParentId() != null) {
+                bfsQueue.add(commit.getMergeParentId());
+            }
+        }
+        bfsQueue.add(givenCommit.getHash());
+        while (!bfsQueue.isEmpty()) {
+            String commitId = bfsQueue.remove();
             Commit commit = Commit.load(commitId);
-            commitId = commit.getParentId();
+            if (currentAncestors.contains(commitId)) {
+                return commit;
+            }
+            if (commit.getParentId() != null) {
+                bfsQueue.add(commit.getParentId());
+            }
+            if (commit.getMergeParentId() != null) {
+                bfsQueue.add(commit.getMergeParentId());
+            }
         }
         return null;
     }

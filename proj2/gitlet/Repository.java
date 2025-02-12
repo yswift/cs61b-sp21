@@ -529,13 +529,15 @@ public class Repository {
         if (currentBlobId == null) {
             currentContents = "";
         } else {
-            currentContents = Utils.readContentsAsString(Utils.join(Blob.BLOB_DIR, currentBlobId));
+            Blob currentBlob = Blob.load(currentBlobId);
+            currentContents = currentBlob.getContentAsString();
         }
         if (mergedBlobId == null) {
             mergedContents = "";
         } else {
-            mergedContents = Utils.readContentsAsString(Utils.join(Blob.BLOB_DIR, mergedBlobId));
+            Blob mergedBlob = Blob.load(mergedBlobId);
+            mergedContents = mergedBlob.getContentAsString();
         }
-        return "<<<<<<< HEAD\n" + currentContents + "=======\n" + mergedContents + ">>>>>>>\n";
+        return "<<<<<<< HEAD\n" + currentContents + "\n=======\n" + mergedContents + "\n>>>>>>>\n";
     }
 }

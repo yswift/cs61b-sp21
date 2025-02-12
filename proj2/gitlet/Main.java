@@ -71,7 +71,7 @@ public class Main {
                 Repository.merge(args[1]);
                 break;
             default:
-                Utils.exitWithError(String.format("No command with that %s exists.", args[0]));
+                Utils.exitWithError(String.format("No command with that name exists."));
         }
     }
 

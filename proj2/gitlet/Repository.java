@@ -538,6 +538,6 @@ public class Repository {
             Blob mergedBlob = Blob.load(mergedBlobId);
             mergedContents = mergedBlob.getContentAsString();
         }
-        return "<<<<<<< HEAD\n" + currentContents + "\n=======\n" + mergedContents + "\n>>>>>>>\n";
+        return "<<<<<<< HEAD\n" + currentContents + "=======\n" + mergedContents + ">>>>>>>\n";
     }
 }
